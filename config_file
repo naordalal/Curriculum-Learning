@@ -1,0 +1,50 @@
+[CIFAR100]
+[[Classes]]
+small_mammals = hamster, mouse, rabbit, shrew, squirrel
+household_furniture = bed, chair, couch, table, wardrobe
+people = baby, boy, girl, man, woman
+food_containers = bottle, bowl, can, cup, plate
+fish = aquarium_fish, flatfish, ray, shark, trout
+large_natural_outdoor_scenes = cloud, forest, mountain, plain, sea
+large_man_made_outdoor_things = bridge, castle, house, road, skyscraper
+vehicles_1 = bicycle, bus, motorcycle, pickup_truck, train
+
+[CIFAR10]
+[[Classes]]
+all = airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck
+
+[STL10]
+[[Classes]]
+first = airplane, bird, car, cat, deer
+second = dog, horse, monkey, ship, truck
+
+[EMNIST_Letters]
+[[Params]]
+split = letters
+[[Classes]]
+first = a, b, d, e, g, z, t
+
+[EMNIST_Digits]
+[[Params]]
+split = digits
+[[Classes]]
+all = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+
+[EMNIST_Merged]
+[[Params]]
+split = byclass
+[[Classes]]
+first = A, T, a, j, 4, 6, 0
+
+[FMNIST]
+[[Classes]]
+first = T-shirt/top, Trouser, Pullover, Dress, Coat
+second = Sandal, Shirt, Sneaker, Bag, Ankle boot
+
+[ImageNet]
+[[Classes]]
+first = orange, banana, cup, red wine, fretzel
+second = stove, printer, pillow, pijama, missile
+third = hammer, dome, balloon, nail, mask
+fourth = golf ball, envelope, zebra, poodle, flamingo
+fifth = snail, jelly fish, rugby ball, mushroom, corn
