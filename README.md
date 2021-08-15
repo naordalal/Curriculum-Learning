@@ -1,7 +1,7 @@
 # Curriculum-Learning
 Machine learning final project - Curriculum Learning
 
-[Report](report.pdf)
+[Report](Article.pdf)
 
 [Article GitHub](https://github.com/GuyHacohen/curriculum_learning)
 
