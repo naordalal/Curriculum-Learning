@@ -6,6 +6,6 @@ Machine learning final project - Curriculum Learning
 [Article GitHub](https://github.com/GuyHacohen/curriculum_learning)
 
 ## How to run
-```bash
+```sh
 python3 main.py
 ```
