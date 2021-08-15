@@ -126,7 +126,7 @@ def get_ImageNet_data():
     Output: ImageNet x,y, class_to_idx dict, epochs
     '''
     epochs = 150
-    x, y = read_pickle("imagenet32")
+    x, y = read_pickle("datasets/imagenet32")
     class_to_idx = {'orange': 950, 'banana': 954, 'cup': 965, 'red wine': 966, 'fretzel': 932, \
                     'stove': 827, 'printer': 742, 'pillow': 721, 'pijama': 697, 'missile': 657, \
                     'hammer': 587, 'dome': 538, 'balloon': 417, 'nail': 677, 'mask': 643, \
