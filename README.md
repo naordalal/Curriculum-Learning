@@ -7,6 +7,7 @@ Machine learning final project - Curriculum Learning
 
 ## How to run
 Install [Git LFS](https://git-lfs.github.com/) and clone the project.
+
 Run the following command:
 ```sh
 python3 main.py
