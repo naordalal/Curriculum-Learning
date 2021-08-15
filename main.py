@@ -57,7 +57,7 @@ def cv_training(x, y, hyperparameters, dataset_name, kind, optmizer, loss_fn, de
     in_channels = x.shape[1]
 
     outer_skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=0)
-    inner_skf = StratifiedKFold(n_splits=3, random_state=0)
+    inner_skf = StratifiedKFold(n_splits=3)
 
     for idx, (train_val_index, test_index) in enumerate(outer_skf.split(x, y)):
         x_train_val, x_test = x[train_val_index], x[test_index]
