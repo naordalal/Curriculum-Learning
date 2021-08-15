@@ -40,8 +40,8 @@ def get_data_by_class(x, y, class_to_idx, super_classes, basic_hyperparams, curr
     sets = []
     sets.append(['curriculum'] + get_super_classes_data(x, y, class_to_idx, super_classes) + [curri_hyperparams, True])
     sets.append(['linear_curriculum'] + get_super_classes_data(x, y, class_to_idx, super_classes) + [linear_hyperparameters, True])
-    sets.append(['stratified'] + get_super_classes_data(x, y, class_to_idx, super_classes) + [basic_hyperparams, False])
-    sets.append(['vanilla'] + get_super_classes_data(x, y, class_to_idx, super_classes) + [basic_hyperparams, False])
+    sets.append(['stratified'] + get_super_classes_data(x, y, class_to_idx, super_classes) + [basic_hyperparams, True])
+    sets.append(['vanilla'] + get_super_classes_data(x, y, class_to_idx, super_classes) + [basic_hyperparams, True])
     return sets
 
 def cv_training(x, y, hyperparameters, dataset_name, kind, optmizer, loss_fn, device, random_search=False, 
@@ -63,20 +63,17 @@ def cv_training(x, y, hyperparameters, dataset_name, kind, optmizer, loss_fn, de
         x_train_val, x_test = x[train_val_index], x[test_index]
         y_train_val, y_test = y[train_val_index], y[test_index]
 
-        if random_search:
-            best = [0]
-            for iter_i in range(50):
-                random_hyperparams = select_params_randomly(hyperparameters)
-                for train_index, val_index in inner_skf.split(x_train_val, y_train_val):
-                    x_train, x_val = x_train_val[train_index], x_train_val[val_index]
-                    y_train, y_val = y_train_val[train_index], y_train_val[val_index]
-                    model = Net(in_channels, n_classes, loss_fn, optimizer, device, kind, **random_hyperparams)
-                    score, _ = model.fit(x_train, y_train, x_val, y_val)
-                    if score > best[0]:
-                        best = [score, random_hyperparams]
-            best_params = best[1]
-        else:
-            best_params = hyperparameters
+        best = [0]
+        for iter_i in range(50):
+            random_hyperparams = select_params_randomly(hyperparameters)
+            for train_index, val_index in inner_skf.split(x_train_val, y_train_val):
+                x_train, x_val = x_train_val[train_index], x_train_val[val_index]
+                y_train, y_val = y_train_val[train_index], y_train_val[val_index]
+                model = Net(in_channels, n_classes, loss_fn, optimizer, device, kind, **random_hyperparams)
+                score, _ = model.fit(x_train, y_train, x_val, y_val)
+                if score > best[0]:
+                    best = [score, random_hyperparams]
+        best_params = best[1]
 
         
         model = Net(in_channels, n_classes,loss_fn, optimizer, device, kind, **best_params)
@@ -123,17 +120,17 @@ def run_on_dataset(data, dataset_name):
 
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD
+
+basic_hyperparams = {'batch_size': [100], 'epochs': [150], 'lr_step_length': [200, 400, 600, 800],
+                        'initial_lr':[0.035, 0.05, 0.01, 0.001, 0.0035], 'decay_lr':[1.5, 1.3, 1.1]}
+
 curriculum_hyperparams = {'batch_size': [100], 'epochs': [150], 'pacing_func':[fixed_pacing], 'starting_percent':[0.05, 0.1, 0.15, 0.2],
-                        'increase_amount':[1.5, 2, 3], 'step_length':[50, 100, 200, 400], 'lr_step_length': [200, 400, 600, 800],
-                        'initial_lr':[0.035, 0.05, 0.01], 'decay_lr':[1.5, 1.3, 1.1]}
-curri_hyps = {'batch_size': [100], 'epochs': [25], 'pacing_func':[fixed_pacing], 'starting_percent':[0.1, 0.2],
-                        'increase_amount':[1.5, 2], 'step_length':[100, 200], 'lr_step_length': [200, 400, 600, 800],
-                        'initial_lr':[0.035, 0.05, 0.01], 'decay_lr':[1.5, 1.3, 1.1]}
-linear_curri_hyps = {'batch_size': [100], 'epochs': [25], 'starting_percent':[0.1, 0.2], 'pacing_func':[linear_pacing],
-                        'increase_amount':[1.2, 1.1, 1.3], 'step_length':[100, 200], 'lr_step_length': [200, 400, 600, 800],
+                        'increase_amount':[1.5, 2, 3], 'step_length':[50, 100, 200, 400, 800], 'lr_step_length': [200, 400, 600, 800],
                         'initial_lr':[0.035, 0.05, 0.01], 'decay_lr':[1.5, 1.3, 1.1]}
 
-basic_hyperparams = {'batch_size': 100, 'epochs': 10, 'initial_lr':0.035}
+linear_hyperparams = {'batch_size': [100], 'epochs': [150], 'pacing_func':[linear_pacing], 'starting_percent':[0.05, 0.1, 0.15, 0.2],
+                        'increase_amount':[1.2, 1.1, 1.3, 1.5], 'lr_step_length': [200, 400],
+                        'initial_lr':[0.035, 0.05, 0.01], 'decay_lr':[1.5, 1.3, 1.1]}
 
 config = ConfigObj('config_file')
 
@@ -143,10 +140,10 @@ for idx, dataset_name in enumerate(config):
     if 'Params' in config[dataset_name]:
       params = config[dataset_name]['Params']
     x, y, class_to_idx, epochs = get_data(dataset_name, **params)
-    basic_hyperparams['epochs'], curri_hyps['epochs'], linear_curri_hyps['epochs'] = epochs, [epochs], [epochs]
+    basic_hyperparams['epochs'], curriculum_hyperparams['epochs'], linear_hyperparams['epochs'] = [epochs], [epochs], [epochs]
     classes = config[dataset_name]['Classes']
     for idx, category in enumerate(classes):
-        data = get_data_by_class(x, y, class_to_idx, classes[category], basic_hyperparams, curri_hyps, linear_curri_hyps)
+        data = get_data_by_class(x, y, class_to_idx, classes[category], basic_hyperparams, curriculum_hyperparams, linear_hyperparams)
         total_metrics += run_on_dataset(data, dataset_name + '_' + category)
 
 df = pd.read_csv('scores_for_report.csv')
